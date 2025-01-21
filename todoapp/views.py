@@ -5,11 +5,17 @@ from django.contrib import messages
 from .models import todo
 
 # Create your views here.
+from django.contrib import messages
+
 def home(request):
     if request.method == 'POST':
         task = request.POST.get('task')
+        if not task:  # Check if task is empty
+            messages.error(request, 'The field must not be empty!')
+            return redirect('home-page')
         new_todo = todo(user=request.user, todo_name=task)
         new_todo.save()
+        messages.success(request, 'Task added successfully')
     all_todos = todo.objects.filter(user=request.user)
     context = {
         'todos': all_todos
@@ -53,8 +59,9 @@ def loginpage(request):
     return render(request,'todoapp/login.html',{})
 
 def delete(request, name):
-    get_todo = todo.objects.get(user=request.user, todo_name=name)
-    get_todo.delete()
+    get_todo = todo.objects.filter(user=request.user, todo_name=name).first()
+    if get_todo:
+        get_todo.delete()
     return redirect('home-page')
 def update(request, name):
     get_todo = todo.objects.get(user=request.user, todo_name=name)

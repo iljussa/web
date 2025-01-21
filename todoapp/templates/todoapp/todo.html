@@ -26,7 +26,24 @@
                   <button type="submit" class="btn btn-primary">Add Task</button>
                 </div>
               </form>
-              <a href="{% url 'logout' %}"><button style="background: firebrick; color: white;" type="submit" class="btn btn-primary">Logout</button></a>
+              
+              {% if messages %}
+              {% for message in messages %}
+                <h4 align = "center" class="alert alert-{{ message.tags }}" style="color: #b22222;">
+                  {{ message }}
+                </h4>
+              {% endfor %}
+              {% with messages|length as msg_len %}
+                {% if msg_len > 0 %}
+                  <script>
+                    setTimeout(function() {
+                      document.querySelector('.alert').remove();
+                    }, 2500);
+                  </script>
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+
               <table class="table mb-4">
                 <thead>
                   <tr>
@@ -47,8 +64,10 @@
                     {% endif %}
 
                     <td>
+                      {% if i.todo_name %}
                       <a href="{% url 'delete' i.todo_name %}"><button type="submit" class="btn btn-danger">Delete</button></a>
                       <a href="{% url 'update' i.todo_name %}"><button type="submit" class="btn btn-success ms-1">Finished</button></a>
+                      {% endif %}
                     </td>
                   </tr>
                   {% endfor %}
